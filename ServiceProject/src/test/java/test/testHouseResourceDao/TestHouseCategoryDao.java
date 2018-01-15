@@ -1,4 +1,4 @@
-package test.testHouseResourceDao;
+﻿package test.testHouseResourceDao;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +22,7 @@ public class TestHouseCategoryDao extends BaseTest {
 
 		HouseCategory category1 = new HouseCategory();
 		category1.setHouseResourceId(35L);
-		category1.setHouseCategoryName("二手房1");
+		category1.setHouseCategoryName("二手房777");
 		category1.setPriority(2);
 		
 
