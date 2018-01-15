@@ -22,9 +22,15 @@ public class TestHouseCategoryDao extends BaseTest {
 
 		HouseCategory category1 = new HouseCategory();
 		category1.setHouseResourceId(35L);
+<<<<<<< HEAD
 		category1.setHouseCategoryName("二手房777");
 		category1.setPriority(2);
 		
+=======
+		category1.setHouseCategoryName("二手房1");
+		category1.setPriority(1);
+		category1.setCreateTime(new Date());
+>>>>>>> parent of b5a2f27... zz
 
 		HouseCategory category2 = new HouseCategory();
 		category2.setHouseResourceId(35L);
