@@ -1,0 +1,15 @@
+.row-house {
+    border: 1px solid #999;
+    padding: .5rem;
+    border-bottom: none;
+}
+.row-house:last-child {
+    border-bottom: 1px solid #999;
+}
+.house-name {
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+.house-wrap a {
+    margin-right: 1rem;
+}

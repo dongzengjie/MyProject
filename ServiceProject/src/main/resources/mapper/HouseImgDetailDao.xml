@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nizubuzu.androidService.dao.HouseImgDetailDao">
+
+
+	<insert id="batchinsertHouseDetailImg" parameterType="java.util.List"
+		useGeneratedKeys="true" keyColumn="house_detailimg_id" keyProperty="houseDetailimgId">
+
+		INSERT INTO tb_house_detailimg
+		(
+		img_addr,
+		img_desc,
+		priority,
+		create_time,
+		house_id
+		)
+		VALUES
+		<foreach collection="list" index="index" separator=","
+			item="houseDetailImgs">
+
+			(
+			#{houseDetailImgs.imgAddr},
+			#{houseDetailImgs.imgDesc},
+			#{houseDetailImgs.priority},
+			#{houseDetailImgs.createTime},
+			#{houseDetailImgs.houseId}
+			)
+		</foreach>
+	</insert>
+	
+	<select id="queryListHouseDetaiImg" parameterType="Long" resultType="com.nizubuzu.androidService.entity.HouseDetailImg">
+		SELECT
+		house_detailimg_id,
+		img_addr,
+		img_desc,
+		priority,
+		create_time,
+		house_id
+		FROM
+		tb_house_detailimg
+		where
+		house_id=#{houseId}
+		
+	</select>
+	
+	<delete id="deleteHouseDetailImg" parameterType="Long">
+	
+		DELETE from tb_house_detailimg where house_id=#{houseId}
+	</delete>
+</mapper>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nizubuzu.androidService.dao.HouseResourceDao">
+
+	<resultMap type="com.nizubuzu.androidService.entity.HouseResource"
+		id="houseResourceMap">
+
+		<id column="house_resource_id" property="houseResourceId" />
+		<result column="house_resource_name" property="houseResourceName" />
+		<result column="house_resource_desc" property="houseResourceDesc" />
+		<result column="house_resource_addr" property="houseResourceAddr" />
+		<result column="phone" property="phone" />
+		<result column="house_resource_img" property="houseResourceImg" />
+		<result column="priority" property="priority" />
+		<result column="create_time" property="createTime" />
+		<result column="last_edit_time" property="lastEditTime" />
+		<result column="enable_status" property="enableStatus" />
+		<result column="advice" property="advice" />
+		<result column="area_msg" property="areaMsg" />
+
+	<!-- 	<association property="area" column="area_id"
+			javaType="com.nizubuzu.androidService.entity.Area">
+			<id column="area_id" property="areaId" />
+			<result column="area_name" property="areaName" />
+		</association> -->
+
+
+		<association property="owner" column="owner_id"
+			javaType="com.nizubuzu.androidService.entity.PersionInfo">
+			<id column="user_id" property="userId" />
+			<result column="name" property="name" />
+		</association>
+	</resultMap>
+
+	<select id="queryByHouseResourceId" resultMap="houseResourceMap"
+		parameterType="Long">
+		SELECT
+		hr.house_resource_id,
+		hr.house_resource_name,
+		hr.house_resource_desc,
+		hr.house_resource_addr,
+		hr.phone,
+		hr.house_resource_img,
+		hr.priority,
+		hr.create_time,
+		hr.last_edit_time,
+		hr.enable_status,
+		hr.advice,
+		hr.area_msg,
+	<!-- 	a.area_id,
+		a.area_name, -->
+		p.user_id,
+		p.name
+		FROM
+		tb_house_resource hr,
+		tb_area a,
+		tb_persion_info p
+		WHERE
+	<!-- 	hr.area_id=a.area_id
+		AND -->
+		hr.owner_id=p.user_id
+		AND
+		hr.house_resource_id=#{houseResourceId}
+
+	</select>
+
+	<insert id="insertHouseResource" parameterType="com.nizubuzu.androidService.entity.HouseResource"
+		useGeneratedKeys="true" keyColumn="house_resource_id" keyProperty="houseResourceId">
+		INSERT INTO
+		tb_house_resource
+		(
+		owner_id,area_id,house_resource_name,house_resource_desc,house_resource_addr,phone,house_resource_img,priority,create_time,last_edit_time,enable_status,advice,area_msg
+		)
+		VALUES
+		(
+		#{owner.userId},#{area.areaId},#{houseResourceName},#{houseResourceDesc},#{houseResourceAddr},#{phone},#{houseResourceImg},#{priority},#{createTime},#{lastEditTime},#{enableStatus},#{advice},#{areaMsg}
+		)
+	</insert>
+
+	<update id="updataHouseResource" parameterType="com.nizubuzu.androidService.entity.HouseResource">
+		UPDATE tb_house_resource
+		<set>
+			<if test="houseResourceName !=null">house_resource_name=#{houseResourceName},</if>
+			<if test="houseResourceDesc !=null">house_resource_desc=#{houseResourceDesc},</if>
+		<!-- 	<if test="area !=null">area_id=#{area.areaId},</if> -->
+			<if test="houseResourceAddr !=null">house_resource_addr=#{houseResourceAddr},</if>
+			<if test="phone !=null">phone=#{phone},</if>
+			<if test="houseResourceImg !=null">house_resource_img=#{houseResourceImg},</if>
+			<if test="priority !=null">priority=#{priority},</if>
+			<if test="lastEditTime !=null">last_edit_time=#{lastEditTime},</if>
+			<if test="enableStatus !=null">enable_status=#{enableStatus},</if>
+
+			<if test="advice !=null">advice=#{advice},</if>
+			<if test="areaMsg !=null">area_msg=#{areaMsg}</if>
+	
+		</set>
+		WHERE
+		house_resource_id=#{houseResourceId}
+	</update>
+
+	<select id="queryHouseResourceList" resultMap="houseResourceMap">
+		SELECT
+		hr.house_resource_id,
+		hr.house_resource_name,
+		hr.house_resource_desc,
+		hr.house_resource_addr,
+		hr.phone,
+		hr.house_resource_img,
+		hr.priority,
+		hr.create_time,
+		hr.last_edit_time,
+		hr.enable_status,
+		hr.advice,
+		hr.area_msg,
+	
+		p.user_id,
+		p.name
+		FROM
+		tb_house_resource hr,
+		tb_area a,
+		tb_persion_info p
+		<where>
+
+			<if test="houseResource.houseResourceName !=null">
+				and hr.house_resource_name like
+				'%${houseResource.houseResourceName}%'
+			</if>
+			<if test="houseResource.houseResourceAddr !=null">
+				and hr.house_resource_addr
+				=#{houseResource.houseResourceAddr}
+			</if>
+			<if test="houseResource.priority !=null">
+				and hr.priority=#{houseResource.priority}
+			</if>
+			<if test="houseResource.area !=null and houseResource.area.areaId !=null">
+				and hr.area_id=#{houseResource.area.areaId}
+			</if>
+			<if
+				test="houseResource.owner !=null and houseResource.owner.userId !=null ">
+				and hr.owner_id=#{houseResource.owner.userId}
+			</if>
+			<!-- AND
+			hr.area_id=a.area_id -->
+			AND
+			hr.owner_id=p.user_id
+
+		</where>
+		ORDER By
+		hr.priority DESC
+		LIMIT
+		#{rowIndex},#{pageSize}
+
+	</select>
+
+
+	<select id="queryHouseResouceCount" resultType="Integer">
+		SELECT
+		count(1)
+		FROM
+		tb_house_resource hr,
+		<!-- tb_area a, -->
+		tb_persion_info p
+		<where>
+
+			<if test="houseResource.houseResourceName !=null">
+				and hr.house_resource_name like
+				'%${houseResource.houseResourceName}%'
+			</if>
+			<if test="houseResource.houseResourceAddr !=null">
+				and hr.house_resource_addr
+				=#{houseResource.houseResourceAddr}
+			</if>
+			<if test="houseResource.priority !=null">
+				and hr.priority=#{houseResource.priority}
+			</if>
+			<!-- <if test="houseResource.area !=null and houseResource.area.areaId !=null">
+				and hr.area_id=#{houseResource.area.areaId}
+			</if> -->
+			<if
+				test="houseResource.owner !=null and houseResource.owner.userId !=null ">
+				and hr.owner_id=#{houseResource.owner.userId}
+			</if>
+			<!-- AND
+			hr.area_id=a.area_id -->
+			AND
+			hr.owner_id=p.user_id
+
+		</where>
+
+	</select>
+
+</mapper>

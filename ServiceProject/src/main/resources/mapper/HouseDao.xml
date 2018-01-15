@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nizubuzu.androidService.dao.HouseDao">
+
+
+
+	<resultMap type="com.nizubuzu.androidService.entity.House"
+		id="houseMap">
+		<id column="house_id" property="houseId" />
+		<result column="house_name" property="houseName" />
+		<result column="house_desc" property="houseDesc" />
+		<result column="img_addr" property="imgAddr" />
+		<result column="price" property="price" />
+		<result column="priority" property="priority" />
+		<result column="create_time" property="create_time" />
+		<result column="last_edit_time" property="lastEditTime" />
+		<result column="enable_status" property="enableStatus" />
+
+		<association property="houseCategory" column="house_category_id"
+			javaType="com.nizubuzu.androidService.entity.HouseCategory">
+			<id column="house_category_id" property="houseCategoryId" />
+			<result column="house_category_name" property="houseCategoryName" />
+		</association>
+
+		<association property="houseResource" column="house_resource_id"
+			javaType="com.nizubuzu.androidService.entity.HouseResource">
+			<id column="house_resource_id" property="houseResourceId" />
+			<result column="house_resource_name" property="houseResourceName" />
+		</association>
+
+		<collection property="houseDetailImgs" column="house_id"
+			ofType="com.nizubuzu.androidService.entity.HouseDetailImg">
+			<id column="house_detailimg_id" property="houseDetailimgId" />
+			<result column="detail_img" property="imgAddr" />
+			<result column="img_desc" property="imgDesc" />
+			<result column="priority" property="priority" />
+			<result column="create_time" property="createTime" />
+			<result column="house_id" property="houseId" />
+			
+		</collection>
+
+	</resultMap>
+
+	<select id="queryHouseByHouseId" parameterType="Long"
+		resultMap="houseMap">
+		SELECT
+		h.house_id,
+		h.house_name,
+		h.house_desc,
+		h.img_addr,
+		h.price,
+		h.priority,
+		h.create_time,
+		h.last_edit_time,
+		h.enable_status,
+		h.house_category_id,
+		h.house_resource_id,
+		hm.house_detailimg_id,
+		hm.img_addr AS detail_img,
+		hm.img_desc,
+		hm.priority,
+		hm.create_time
+		FROM
+		tb_house h
+		LEFT
+		JOIN
+		tb_house_detailimg hm
+		ON
+		h.house_id=hm.house_id
+		where
+		h.house_id=#{houseId}
+		ORDER BY
+		h.priority DESC
+
+
+	</select>
+
+	<insert id="insertHouse" parameterType="com.nizubuzu.androidService.entity.House" keyColumn="house_id" keyProperty="houseId" useGeneratedKeys="true">
+		INSERT INTO tb_house
+		(
+		house_name,
+		house_desc,
+		img_addr,
+		price,
+		priority,
+		create_time,
+		last_edit_time,
+		enable_status,
+		house_category_id,
+		house_resource_id
+		)
+		VALUES
+		(
+		#{houseName},
+		#{houseDesc},
+		#{imgAddr},
+		#{price},
+		#{priority},
+		#{create_time},
+		#{lastEditTime},
+		#{enableStatus},
+		#{houseCategory.houseCategoryId},
+		#{houseResource.houseResourceId}
+		)
+
+	</insert>
+
+	<update id="updateHouseCategoryIdToNull" parameterType="Long" >
+		UPDATE tb_house
+		set house_category_id=null
+		where
+		house_category_id=#{houseCategoryId}
+	</update>
+	
+	<update id="updateHouse" parameterType="com.nizubuzu.androidService.entity.House" >
+		UPDATE tb_house
+		<set>
+			<if test="houseName !=null">house_name=#{houseName},</if>
+			<if test="houseDesc !=null">house_desc=#{houseDesc},</if>
+			<if test="imgAddr !=null">img_addr=#{imgAddr},</if>
+			<if test="price !=null">price=#{price},</if>
+			<if test="priority !=null">priority=#{priority},</if>
+			<if test="lastEditTime !=null">last_edit_time=#{lastEditTime},</if>
+			<if test="enableStatus !=null">enable_status=#{enableStatus},</if>
+			<if test="houseCategory !=null and houseCategory.houseCategoryId !=null ">
+				 house_category_id=#{houseCategory.houseCategoryId}
+			</if>
+		</set>
+		WHERE
+		house_id=#{houseId} and house_resource_id=#{houseResource.houseResourceId}
+	</update>
+	<select id="queryHouseList" resultType="com.nizubuzu.androidService.entity.House">
+		SELECT
+		house_id,
+		house_name,
+		house_desc,
+		img_addr,
+		price,
+		priority,
+		create_time,
+		last_edit_time,
+		enable_status,
+		house_category_id,
+		house_resource_id
+		FROM
+		tb_house
+		<where>
+			<if test="house.houseResource !=null and house.houseResource.houseResourceId !=null">
+				and house_resource_id=#{house.houseResource.houseResourceId}
+			</if>
+			<if test="house.houseCategory !=null and house.houseCategory.houseCategoryId !=null ">
+				and house_category_id=#{house.houseCategory.houseCategoryId}
+			</if>
+			<if test="house.houseName !=null">
+				and house_name like '%${house.houseName}%'
+			</if>
+			<if test="house.enableStatus !=null">
+				and enable_status=#{house.enableStatus}
+			</if>
+			
+		</where>
+		ORDER BY
+		priority DESC
+		LIMIT #{rowIndex},#{pageSize}
+	</select>
+	
+	<select id="queryCount" resultType="Integer">
+	
+		SELECT count(1) from tb_house 
+			<where>
+			<if test="house.houseResource !=null and house.houseResource.houseResourceId !=null">
+				and house_resource_id=#{house.houseResource.houseResourceId}
+			</if>
+			<if test="house.houseCategory !=null and house.houseCategory.houseCategoryId !=null ">
+				and house_category_id=#{house.houseCategory.houseCategoryId}
+			</if>
+			<if test="house.houseName !=null">
+				and house_name like '%${house.houseName}%'
+			</if>
+			<if test="house.enableStatus !=null">
+				and enable_status=#{house.enableStatus}
+			</if>
+		</where>
+	</select>
+	
+
+</mapper>

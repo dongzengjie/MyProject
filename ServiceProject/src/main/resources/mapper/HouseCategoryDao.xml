@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nizubuzu.androidService.dao.HouseCategoryDao">
+
+	<insert id="batchinserthouseCategory" parameterType="java.util.List">
+		INSERT INTO
+		tb_house_category(house_category_name,priority,create_time,house_resource_id)
+		VALUES
+		<foreach collection="list" item="houseCategories" index="index"
+			separator=",">
+			(
+			#{houseCategories.houseCategoryName},
+			#{houseCategories.priority},
+			#{houseCategories.createTime},
+			#{houseCategories.houseResourceId}
+			)
+		</foreach>
+	</insert>
+	
+	<select id="queryhouseCategoryByHouseResourceId" resultType="com.nizubuzu.androidService.entity.HouseCategory" parameterType="Long">
+		 SELECT 
+		 house_category_id,
+		 house_category_name,
+		 priority,
+		 create_time,
+		 house_resource_id
+		 FROM
+		 tb_house_category
+		 WHERE
+		 house_resource_id=#{houseResourceId}
+		 ORDER BY
+		 priority DESC
+	</select>
+	
+	<delete id="deleteByhouseResourceIdAndhouseCategoryId" >
+		DELETE FROM tb_house_category where house_resource_id=#{houseResourceId} and house_category_id=#{houseCategoryId}
+	</delete>
+	
+</mapper>
